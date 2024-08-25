@@ -1,0 +1,9 @@
+{
+  "dependencies": {
+    "commander": "^12.1.0",
+    "viem": "^2.20.0"
+  },
+  "devDependencies": {
+    "@types/node": "^22.5.0"
+  }
+}

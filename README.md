@@ -46,32 +46,25 @@ Check out the official [documentation](https://docs.polygon.technology/pos/archi
 
 In the traditional setup:
 
-- Finality was probabilistic. Users and developers had to wait for 256 blocks to pass before they could be reasonably sure that a transaction was final. This meant that there was always a small chance of a reorganization (reorg), where a different chain might become the canonical chain.
+- Finality was **probabilistic**. Users and developers had to wait for 256 blocks to pass before they could be reasonably sure that a transaction was final. This meant that there was always a small chance of a reorganization (reorg), where a different chain might become the canonical chain.
+
 - Checkpoints to Ethereum: Heimdall would submit checkpoints to Ethereum after every 256 blocks, anchoring Polygon’s state to the security of Ethereum. However, finality on the Polygon chain itself was slow and uncertain until this checkpoint was confirmed.
 
 ![Finality Before Milestones](./pics/256.png)
 
 Finality achieved after 256 blocks (approx. 10 minutes)
 
-2.2 After Milestones
+### 2.2 After Milestones
 
 With the introduction of milestones:
 
-- Finality is deterministic. After a certain number of blocks (e.g., 16), a milestone is proposed and validated by Heimdall. Once 2/3+ of the network agrees, the milestone is finalized, and all transactions up to that milestone are considered final, with no chance of reorganization.
+- Finality is **deterministic**. After a certain number of blocks (e.g., 16), a milestone is proposed and validated by Heimdall. Once 2/3+ of the network agrees, the milestone is finalized, and all transactions up to that milestone are considered final, with no chance of reorganization.
+
 - Separation of Checkpoints and Milestones: Checkpoints still occur every 256 blocks and are submitted to Ethereum. However, milestones provide much faster finality on the Polygon chain itself, improving the user experience significantly.
 
 ![Finality After Milestones](./pics/16.png)
 
 Finality achieved after 16 blocks (approx. 1-2 minutes)
-
-### 2.3 Finality, Checkpoints, and Milestones
-
-- Finality Differences:
-- Before Milestones: Finality was probabilistic, taking longer and being less certain.
-- After Milestones: Finality is deterministic, faster, and more reliable.
-- Checkpoint and Milestone Separation:
-- Checkpoints continue to secure the state of the Polygon chain by anchoring it to Ethereum every 256 blocks.
-- Milestones allow for faster finality on the Polygon chain, reducing wait times and improving the overall experience.
 
 ## 3. Code Examples and Running on a Local Machine
 
