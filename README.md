@@ -66,69 +66,95 @@ With the introduction of milestones:
 
 Finality achieved after 16 blocks (approx. 1-2 minutes)
 
-## 3. Code Examples and Running on a Local Machine
-
-### 3.1 Setting Up Your Local Environment
-
-- Prerequisites:
-- Node.js and npm installed.
-- Access to a Polygon node (you can use a service like Infura or run your own full node).
-
 ### 3.2 Using the Milestone API
 
-Here’s a simple code example to check if a block has reached finality using the milestone mechanism.
-```javascript
-const axios = require('axios');
-const MATIC_RPC_URL = 'https://polygon-mainnet.infura.io/v3/YOUR_INFURA_PROJECT_ID';
+Here's a simple code example to check if a transaction has reached finality using the milestone mechanism.
 
-async function checkFinality(blockNumber) {
-  try {
-    const response = await axios.post(MATIC_RPC_URL, {
-      jsonrpc: "2.0",
-      id: 1,
-      method: "eth_getBlockByNumber",
-      params: [blockNumber, true]
-    });
-    
-    const latestFinalizedBlock = parseInt(response.data.result.number, 16);
-    console.log(`Latest finalized block: ${latestFinalizedBlock}`);
-    
-    if (latestFinalizedBlock >= blockNumber) {
-      console.log("Your transaction block has been finalized.");
-    } else {
-      console.log("Your transaction block is not yet finalized.");
-    }
-  } catch (error) {
-    console.error("Error checking finality:", error);
+Import Relevant Libraries:
+```typescript
+import { createPublicClient, http, Hash } from 'viem'
+import { polygon, polygonAmoy } from 'viem/chains'
+import { program } from 'commander'
+```
+
+Here's the implementation of Checking Transaction Finality BEFORE Milestones Implementation.
+```typescript
+async function pre_milestones_checkFinality(client: any, txHash: string): Promise<boolean> {
+  const tx = await client.getTransaction({ hash: `0x${txHash}` })
+  if (!tx || !tx.blockNumber) return false
+  const latestBlock: Block = await client.getBlock({ blockTag: 'finalized' })
+
+  console.log(`Latest finalized block: ${latestBlock.number}`)
+  console.log(`Your transaction block: ${tx.blockNumber}`)
+
+  // Checking whether there has been 256 blocks since the transaction was included in a block
+  if (latestBlock.number !== null && latestBlock.number - tx.blockNumber >= 256) {
+    console.log("Your transaction block has been confirmed after 256 blocks");
+    return true
+  } else {
+    return false
   }
 }
-
-checkFinality('0x10d4f');  // Replace '0x10d4f' with your block number in hex format
 ```
+
+Here's the implementation of Checking Transaction Finality AFTER Milestones Implementation
+```typescript
+async function milestones_checkFinality(client: any, txHash: string): Promise<boolean> {
+  const tx = await client.getTransaction({ hash: `0x${txHash}` })
+  if (!tx || !tx.blockNumber) return false
+  const latestBlock: Block = await client.getBlock({ blockTag: 'finalized' })
+
+  console.log(`Latest finalized block: ${latestBlock.number}`)
+  console.log(`Your transaction block: ${tx.blockNumber}`)
+
+  // Checking whether the finalized block number via milestones has reached the transaction block number.
+  if (latestBlock.number !== null && latestBlock.number > tx.blockNumber) {
+    console.log("Your transaction block has been confirmed after 16 blocks");
+    return true
+  } else {
+    return false
+  }
+}
+```
+
+> Please note that this is just a demo purpose to show the previous implementations, since Milestones has already been implemented in the protocol, therefore, 16 blocks is the minimum time for finality, the `pre_milestones_checkFinality` function is not needed anymore in actual implementation. Just use the `milestones_checkFinality` function to check your transaction finality.
 
 ### 3.3 Running the Code Locally
 
-- Step 1: Copy the code into a file named checkFinality.js.
-- Step 2: Replace YOUR_INFURA_PROJECT_ID with your actual Infura project ID.
-- Step 3: Run the code using Node.js:
+- Step 1: Copy the code into a file named milestones.ts.
 
-```javascript
-node checkFinality.js
-```
+- Step 2: Install the required dependencies by running: 
+  ```bash
+  npm install
+  ```
 
+- Step 3: Run the code using Node.js with the required command-line arguments:
+  ```bash
+  npx ts-node milestones.ts --txHash <transaction_hash> --function <function_name> --network <network_name>
+  ```
+  Replace <transaction_hash> with the actual transaction hash, <function_name> with either pre_milestones or milestones, and <network_name> with either polygon or amoy.
 
-- Step 4: Observe the output to determine if your transaction’s block has been finalized.
+- Step 4: Observe the output to determine if your transaction has been finalized based on the selected milestone mechanism and network.
+
+### 3.5 Results
+
+The results should show whether the transaction has been finalized based on the selected milestone mechanism and network.
+Usually Milestones will taking 1-2 minutes to finalize the transaction. Result as follows:
+![milestones_result](./pics/milestones_result.png)
+
+Here's a screenshot of the `pre_milestones_checkFinality` function, where it shows that the new blocks are not yet 256:
+![pre_milestones_result](./pics/pre_milestones_result.png)
+
+Here's a screenshot of the `pre_milestones_checkFinality` function, where it shows that the new blocks are 256:
+![pre_milestones_finalized](./pics/pre_milestones_result_finalized.png)
 
 ### 3.4 Experimenting Further
-
-- Modify the code to check different blocks and see how finality is achieved with milestones.
-- Test network behavior by simulating a fork or reorg in a private devnet and observe how milestones prevent deep reorgs.
+Modify the code to check different transactions and networks to see how finality is achieved with milestones on various Polygon networks.
 
 ## 4 Resources/References
 - [Polygon PoS Documentation](https://docs.polygon.technology/docs/pos/overview)
 - [Polygon PoS Faster Finality Announcement](https://polygon.technology/blog/faster-finality-with-the-aalborg-upgrade-for-polygon-proof-of-stake-network)
 - [PIP-11: Deterministic finality via Milestones](https://forum.polygon.technology/t/pip-11-deterministic-finality-via-milestones/11918)
-- 
 
 # Conclusion
 
