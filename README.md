@@ -15,7 +15,7 @@
 
 ### 1.1 What is Bor?
 
-Bor is the block production layer in the Polygon Proof-of-Stake (PoS) network. It is responsible for:
+Bor is the execution layer in the Polygon Proof-of-Stake (PoS) network. It is responsible for:
 
 - Aggregating transactions into blocks.
 - Managing the execution of smart contracts.
@@ -23,16 +23,17 @@ Bor is the block production layer in the Polygon Proof-of-Stake (PoS) network. I
 
 ### 1.2 What is Heimdall?
 
-Heimdall acts as the validation & consensus layer. It ensures that the blocks produced by Bor are validated and finalized. It also:
+Heimdall acts as the proof of stake layer and uses Tendermint BFT consensus. It decides which validators should be producing blocks in Bor in each span (based on their stake). It also:
 
-- Manages the network’s consensus using the BFT consensus mechanism.
 - Submits checkpoints to the Ethereum mainnet, securing the Polygon chain.
+- Helps in arriving at finality of Bor blocks using Milestones.
+- Plays a key role in state sync mechanism from L1 to Bor.
 
 ### 1.3 How Do They Work Together?
 
-Bor produces the blocks that make up the Polygon PoS chain, while Heimdall validates these blocks and ensures they are consistent and final. Together, they maintain the integrity and security of the network.
+Heimdall determines the validators that should be part of the next span. Bor fetches these details from Heimdall and the selected validators start producing blocks based on the consensus rules. Heimdall also periodically aggregates Bor blocks and submits checkpoints to L1 (Ethereum) to secure the network.
 
-At last, Heimdall is responsible for the finality of the blocks produced by Bor, and submits checkpoints to the Ethereum mainnet.
+Heimdall is also responsible for the finality of blocks produced by Bor which is achieved through a mechanism called Milestones. And we will be diving deeper into Milestones in this tutorial.
 
 ![Bor and Heimdall](./pics/Bor&Heimdall.png)
 
@@ -46,9 +47,9 @@ Check out the official [documentation](https://docs.polygon.technology/pos/archi
 
 In the traditional setup:
 
-- Finality was **probabilistic**. Users and developers had to wait for 256 blocks to pass before they could be reasonably sure that a transaction was final. This meant that there was always a small chance of a reorganization (reorg), where a different chain might become the canonical chain.
+- Finality was **probabilistic** until a checkpoint was submitted to L1. Users and developers had to wait for many blocks (some applications waited 256 blocks) to be created before they could be reasonably sure that a transaction was final. This meant that there was always a small chance of a reorganization (reorg), where a different chain might become the canonical chain.
 
-- Checkpoints to Ethereum: Heimdall would submit checkpoints to Ethereum after every 256 blocks, anchoring Polygon’s state to the security of Ethereum. However, finality on the Polygon chain itself was slow and uncertain until this checkpoint was confirmed.
+- Checkpoints to Ethereum: Heimdall would submit checkpoints to Ethereum after every 256 blocks (minimum), anchoring Polygon’s state to the security of Ethereum. However, finality on the Polygon chain itself was slow and uncertain until this checkpoint was confirmed.
 
 ![Finality Before Milestones](./pics/256.png)
 
@@ -58,13 +59,13 @@ Finality achieved after 256 blocks (approx. 10 minutes)
 
 With the introduction of milestones:
 
-- Finality is **deterministic**. After a certain number of blocks (e.g., 16), a milestone is proposed and validated by Heimdall. Once 2/3+ of the network agrees, the milestone is finalized, and all transactions up to that milestone are considered final, with no chance of reorganization.
+- Finality is **deterministic** even before a checkpoint is submitted to L1. After a certain number of blocks (minimum 12), a milestone is proposed and validated by Heimdall. Once 2/3+ of the network agrees, the milestone is finalized, and all transactions up to that milestone are considered final, with no chance of reorganization.
 
-- Separation of Checkpoints and Milestones: Checkpoints still occur every 256 blocks and are submitted to Ethereum. However, milestones provide much faster finality on the Polygon chain itself, improving the user experience significantly.
+- Separation of Checkpoints and Milestones: Checkpoints still occur every 256 blocks (minimum) and are submitted to Ethereum. However, milestones provide much faster finality on the Polygon chain itself, using Heimdall layer for finalization, improving the user experience significantly.
 
 ![Finality After Milestones](./pics/16.png)
 
-Finality achieved after 16 blocks (approx. 1-2 minutes)
+Finality achieved after 30 blocks (approx. 1 minute)
 
 ### 3.2 Using the Milestone API
 
