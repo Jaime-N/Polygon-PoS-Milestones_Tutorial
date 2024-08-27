@@ -63,7 +63,7 @@ With the introduction of milestones:
 
 - Separation of Checkpoints and Milestones: Checkpoints still occur every 256 blocks (minimum) and are submitted to Ethereum. However, milestones provide much faster finality on the Polygon chain itself, using Heimdall layer for finalization, improving the user experience significantly.
 
-![Finality After Milestones](./pics/16.png)
+![Finality After Milestones](./pics/30.png)
 
 Finality achieved after 30 blocks (approx. 1 minute)
 
