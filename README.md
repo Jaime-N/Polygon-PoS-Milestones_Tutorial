@@ -25,7 +25,7 @@ Bor is the execution layer in the Polygon Proof-of-Stake (PoS) network. It is re
 
 Heimdall acts as the proof of stake layer and uses Tendermint BFT consensus. It decides which validators should be producing blocks in Bor in each span (based on their stake). It also:
 
-- Submits checkpoints to the Ethereum mainnet, securing the Polygon chain.
+- Submits checkpoints to the Ethereum mainnet, securing the PoS chain.
 - Helps in arriving at finality of Bor blocks using Milestones.
 - Plays a key role in state sync mechanism from L1 to Bor.
 
@@ -49,11 +49,11 @@ In the traditional setup:
 
 - Finality was **probabilistic** until a checkpoint was submitted to L1. Users and developers had to wait for many blocks (some applications waited 256 blocks) to be created before they could be reasonably sure that a transaction was final. This meant that there was always a small chance of a reorganization (reorg), where a different chain might become the canonical chain.
 
-- Checkpoints to Ethereum: Heimdall would submit checkpoints to Ethereum after every 256 blocks (minimum), anchoring Polygon’s state to the security of Ethereum. However, finality on the Polygon chain itself was slow and uncertain until this checkpoint was confirmed.
+- Checkpoints to Ethereum: Heimdall would submit checkpoints to Ethereum after every 256 blocks (minimum), anchoring PoS’s state to the security of Ethereum. However, finality on the chain itself was slow and uncertain until this checkpoint was confirmed.
 
 ![Finality Before Milestones](./pics/256.png)
 
-Finality achieved after 256 blocks (approx. 10 minutes)
+Finality achieved after 256 blocks, with a 2s block time (approx. 10 minutes)
 
 ### 2.2 After Milestones
 
@@ -65,7 +65,7 @@ With the introduction of milestones:
 
 ![Finality After Milestones](./pics/30.png)
 
-Finality achieved after 30 blocks (approx. 1 minute)
+Finality achieved after 30 blocks, with a 2s block time (approx. 1 minute)
 
 ### 3.2 Using the Milestone API
 
@@ -149,7 +149,7 @@ Here's a screenshot of the `pre_milestones_checkFinality` function, where it sho
 Here's a screenshot of the `pre_milestones_checkFinality` function, where it shows that the new blocks are 256:
 ![pre_milestones_finalized](./pics/pre_milestones_result_finalized.png)
 
-### 3.4 Experimenting Further
+### 3.4 Further Experimentation
 Modify the code to check different transactions and networks to see how finality is achieved with milestones on various Polygon networks.
 
 ## 4 Resources/References
@@ -159,4 +159,4 @@ Modify the code to check different transactions and networks to see how finality
 
 # Conclusion
 
-This tutorial has walked you through the basics of Bor and Heimdall in the Polygon PoS network, the evolution from probabilistic to deterministic finality with milestones, and provided you with practical code examples to try on your local machine. With this knowledge, you can better understand how Polygon ensures fast, secure, and reliable transaction finality.
+This tutorial introduced the basics of Bor and Heimdall on the Polygon PoS network, the evolution from probabilistic to deterministic finality with milestones, and provided you with practical code examples to try on your local machine. With this knowledge, you can better understand how PoS ensures fast, secure, and reliable transaction finality.
